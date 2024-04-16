@@ -1,7 +1,7 @@
 import mysql.connector
 user="root"
 password=""
-database="apmd"
+database="apmd_new"
 
 def select(q):
 	con=mysql.connector.connect(user=user,password=password,host="localhost",database=database,port=3306)

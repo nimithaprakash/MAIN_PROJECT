@@ -25,11 +25,16 @@ def login():
             qry="select * from teacher where login_id='%s'"%(session['log'])
             res1=select(qry)
             session['teacher']=res1[0]['Teacher_id']
+            
             return redirect(url_for('teacher.teacher_home'))
         if res[0]['user_type']=='student':
             return redirect(url_for('student.student_home'))
         
     return render_template("login.html")
+@public.route("/register",methods=['get','post'])
+def reg():
+    data={}
+    return render_template("register.html",data=data)
 
 @public.route("/teacher_reg",methods=['get','post'])
 def teacher_reg():
@@ -51,7 +56,7 @@ def teacher_reg():
 @public.route("/reg_details",methods=['get','post'])
 def reg_details():
     data={}
-    qry3= "select * from teacher"
+    qry3= "select * from teacher inner join login using(Login_id)"
     data['view']=select(qry3)
         
     if 'action' in request.args:
@@ -64,9 +69,30 @@ def reg_details():
         qry7="delete from teacher where Teacher_id='%s'"%(id)
         print(id)
         delete(qry7)
+        return """<script>alert('DELETED');window.location='reg_details'</script>"""
+    
+    if action=='update':
+        qry="select * from teacher where teacher_id='%s'"%(id)
+        res=select(qry)
+        if res:
+            data['up']=res
+    
+    if 'submit' in request.form:
+        input=request.form['input']
+        lname=request.form['Lname']
+        phone=request.form['phone']
+        email=request.form['email']
+        quali=request.form['qualification']
+        qry8="insert into test values(null,'%s','%s','%s','%s','%s')"%(session['login'],input,lname,phone,email,quali)
+        insert(qry8)
+                
+        return """<script>alert('profile updated');window.location='reg_details'</script>"""
+
+            
+        
           
     return render_template("reg_details.html",data=data)
 
-@public.route("/update",methods=['get','post'])
-def update():
-    return render_template("update.html")
+# @public.route("/update",methods=['get','post'])
+# def update():
+#     return render_template("update.html")

@@ -12,16 +12,16 @@ def admin_home():
 @admin.route("/verify_teacher",methods=['post','get'])
 def manage_test():
     data={}
-    qry3= "select * from teacher"
+    qry3= "select * from teacher inner join login using(Login_id) "
     data['view']=select(qry3)
     
     
     if 'submit' in request.form:
         input=request.form['input']
-        qry8="insert into test values(null,'%s','%s')"%(session['teacher'],input)
+        qry8="insert into teacher values(null,'%s','%s','%s','%s','%s','%s)"%(session['login'],input)
         insert(qry8)
                 
-        return """<script>alert('ADDED');window.location='verify_teacher'</script>"""
+        return """<script>alert('Accepted');window.location='verify_teacher'</script>"""
 
     if 'action' in request.args:
         action=request.args['action']
@@ -30,17 +30,18 @@ def manage_test():
         action=None
         
     if action=='reject':
-        qry9="delete from teacher where teacher_id='%s'"%(id)
+        qry9="delete from teacher where Login_id='%s'"%(id)
         delete(qry9)
-        return """<script>alert('DELLTED');window.location='verify_teacher'</script>"""
+        l="delete from login where login_id='%s'"%(id)
+        delete(l)
+        return """<script>alert('REJECTED');window.location='verify_teacher'</script>"""
+ 
     
-    if action=='update':
-        qry="select * from test where test_id='%s'"%(id)
-        res=select(qry)
-        if res:
-            data['up']=res
-
-        
+    if action=='accept':
+        qry9="update login set user_type='teacher' where login_id='%s'"%(id)
+        delete(qry9)
+        return """<script>alert('ACCPETED');window.location='verify_teacher'</script>"""
+           
     return render_template("verify_teacher.html",data=data)
 
 @admin.route('/view_complaints',methods=['get','post'])
@@ -61,6 +62,22 @@ def send_reply():
         return """<script>alert('reply send successfully');window.location="/view_complaints"</script>"""
         
     return render_template("send_reply.html")
+
+@admin.route("/view_students",methods=['get','post'])
+def view_students():
+    data={}
+    qry="select * from students"
+    res=select(qry)
+    data['view']=res
+    return render_template('view_students.html',data=data)
+    
+@admin.route("/view_participants",methods=['get','post'])
+def view_participants():
+    data={}
+    qry="select * from answers"
+    res=select(qry)
+    data['view']=res
+    return render_template('view_participants.html',data=data)
         
         
     
